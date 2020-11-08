@@ -10,12 +10,13 @@ def createDirectories():
     clipDirectory = workingDirectory+"\Clips"
     if (os.path.isdir(clipDirectory)): #If clip directory exists
         for streamer in streamer_list:
-            if (os.path.isdir(clipDirectory+streamer)): #If streamers folder exists
+            if (os.path.isdir(clipDirectory+"\\"+streamer)): #If streamers folder exists
                 pass
             else:
-                os.makedirs(streamer)
+                os.makedirs(clipDirectory+"\\"+streamer)
     else:
         os.makedirs("Clips")
+        createDirectories()
 
 #Get clips url
 def createClipsUrls():
@@ -28,6 +29,9 @@ def createClipsUrls():
         url += range
         print("Final url:", url)
         url = ""
+
+def getClipToDownload():
+    pass
 
 #Download clip from twitch
 def downloadClip():
