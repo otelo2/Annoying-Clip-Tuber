@@ -1,8 +1,13 @@
 #Downloads clips from twitch using youtube-dl 
 from os.path import isdir
+
+from pyautogui import sleep
 from streamers import streamer_list
 import os
-import pyautogui
+import time
+from selenium import webdriver
+
+driver = webdriver.Chrome("D:\Varios\Python 3\Scripts\chromedriver.exe")
 
 #Create clips directory
 def createDirectories():
@@ -20,26 +25,35 @@ def createDirectories():
 
 #Get clips url
 def createClipsUrls():
-    url =""
+    url = ""
+    urlList = []
     range = "7d"
     for streamer in streamer_list:
         url = "https://www.twitch.tv/"
         url += streamer
         url += "/videos?filter=clips&range="
         url += range
-        print("Final url:", url)
+        urlList.append(url)
         url = ""
+    return urlList
 
 def getClipToDownload():
-    pass
+    urlList = createClipsUrls()
+    driver.maximize_window()
+    for url in urlList:
+        #Go to the url, get the urls for the first 5 clips.
+        #Here selenium starts
+        driver.get(url)
+        sleep(5)
+        pass
 
 #Download clip from twitch
-def downloadClip():
-    os.system("cd Clips & cd Channel & youtube-dl.exe -f best https://www.twitch.tv/flashgamesnemesis/clip/RespectfulEsteemedMetalNotATK")
+def downloadClip(streamer, clipUrl):
+    downloadCommand = "cd Clips & cd "+streamer+" & youtube-dl.exe -f best "+clipUrl
+    os.system(downloadCommand)
 
 def main():
-    createDirectories()
-    #createClipsUrls()
+    getClipToDownload()
 
 if __name__ == "__main__":
     main()
