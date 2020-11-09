@@ -39,21 +39,35 @@ def createClipsUrls():
 
 def getClipToDownload():
     urlList = createClipsUrls()
+    clipList=[]
+    driver.get("https://www.twitch.tv/")
     driver.maximize_window()
+    sleep(8)
     for url in urlList:
         #Go to the url, get the urls for the first 5 clips.
-        #Here selenium starts
         driver.get(url)
-        sleep(5)
-        pass
+        driver.maximize_window()
+        sleep(4)
+        xPathTemp = "//*[@id=\"root\"]/div/div[2]/div/main/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/div/div[3]/div/div/div/div/div[2]/div/div/div[1]/div/div/div/div["
+        for i in range(1,6):
+            clipSite = driver.find_element_by_xpath(xPathTemp + str(i) +"]")
+            clipSite.click()
+            sleep(1)
+            clipList.append(driver.current_url)
+            driver.back()
+    return clipList
 
 #Download clip from twitch
-def downloadClip(streamer, clipUrl):
-    downloadCommand = "cd Clips & cd "+streamer+" & youtube-dl.exe -f best "+clipUrl
-    os.system(downloadCommand)
+def downloadClip():
+    clipList = getClipToDownload()
+    for streamer in streamer_list:
+        for clipUrl in clipList:
+            downloadCommand = "cd Clips & cd "+streamer+" & youtube-dl.exe -f best "+clipUrl
+            os.system(downloadCommand)
 
 def main():
-    getClipToDownload()
+    createDirectories()
+    downloadClip()
 
 if __name__ == "__main__":
     main()
