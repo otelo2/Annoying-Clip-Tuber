@@ -54,7 +54,9 @@ def getClipToDownload():
             clipSite.click()
             sleep(1)
             clipList.append(driver.current_url)
+            sleep(0.2)
             driver.back()
+    driver.quit()
     return clipList
 
 #Download clip from twitch
