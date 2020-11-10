@@ -57,18 +57,40 @@ def getClipToDownload():
             sleep(0.2)
             driver.back()
     driver.quit()
+    clipFile = open("ClipsUrls.txt","w")
+    for c in clipList:
+        clipFile.write(c+"\n")
+    clipFile.close()
+    return clipList
+
+def parseClipFile():
+    f = open("ClipsUrls.txt","r")
+    content = f.read()
+    clipList = content.split("\n")
+    f.close()
     return clipList
 
 #Download clip from twitch
 def downloadClip():
-    clipList = getClipToDownload()
-    for streamer in streamer_list:
-        for clipUrl in clipList:
-            downloadCommand = "cd Clips & cd "+streamer+" & youtube-dl.exe -f best "+clipUrl
+    clipList = parseClipFile()
+    count=0
+    streamer = 0
+    for clipUrl in clipList:
+        try:
+            downloadCommand = "cd Clips & cd "+streamer_list[streamer]+" & youtube-dl.exe -f best "+clipUrl
             os.system(downloadCommand)
+            print("\n")
+            count +=1
+            if ((count) % 5 == 0):
+                streamer += 1
+                print("\n")
+        except IndexError as e:
+            print("Finished downloading every clip.")
+            break
+
 
 def main():
-    createDirectories()
+    #createDirectories()
     downloadClip()
 
 if __name__ == "__main__":
