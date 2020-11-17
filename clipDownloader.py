@@ -47,7 +47,7 @@ def getClipToDownload(numClips):
     sleep(8)
     for url in urlList:
         #Go to the url, get the urls for the first 5 clips.
-        driver.get()
+        driver.get(url)
         driver.maximize_window()
         sleep(4)
         xPathTemp = "//*[@id=\"root\"]/div/div[2]/div/main/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/div/div[3]/div/div/div/div/div[2]/div/div/div[1]/div/div/div/div["
@@ -103,7 +103,7 @@ def main():
         clipsToDownload = int(input("How many clips do you want to download? (per streamer)\n"))
         getClipToDownload(clipsToDownload)
     elif selection == 2:
-        #This shouldn't work like this, fix later
+        #TODO: This shouldn't work like this, fix later
         clipsToDownload = int(input("How many clips do you want to download? (per streamer)\n"))
         downloadClip(clipsToDownload)
     elif selection == 3:
