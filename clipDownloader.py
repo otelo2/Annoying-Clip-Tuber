@@ -2,12 +2,11 @@
 from os.path import isdir
 
 from pyautogui import sleep
+import selenium
 from streamers import streamer_list
 import os
 import time
 from selenium import webdriver
-
-driver = webdriver.Chrome("D:\Varios\Python 3\Scripts\chromedriver.exe")
 
 #Create clips directory
 def createDirectories():
@@ -37,7 +36,8 @@ def createClipsUrls():
         url = ""
     return urlList
 
-def getClipToDownload():
+def getClipToDownload(numClips):
+    driver = webdriver.Chrome("D:\Varios\Python 3\Scripts\chromedriver.exe")
     urlList = createClipsUrls()
     clipList=[]
     driver.get("https://www.twitch.tv/")
@@ -49,7 +49,7 @@ def getClipToDownload():
         driver.maximize_window()
         sleep(4)
         xPathTemp = "//*[@id=\"root\"]/div/div[2]/div/main/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/div/div[3]/div/div/div/div/div[2]/div/div/div[1]/div/div/div/div["
-        for i in range(1,6):
+        for i in range(1,numClips+1):
             clipSite = driver.find_element_by_xpath(xPathTemp + str(i) +"]")
             clipSite.click()
             sleep(1)
@@ -71,7 +71,7 @@ def parseClipFile():
     return clipList
 
 #Download clip from twitch
-def downloadClip():
+def downloadClip(clipsToDownload):
     clipList = parseClipFile()
     count=0
     streamer = 0
@@ -81,7 +81,7 @@ def downloadClip():
             os.system(downloadCommand)
             print("\n")
             count +=1
-            if ((count) % 5 == 0):
+            if ((count) % clipsToDownload == 0):
                 streamer += 1
                 print("\n")
         except IndexError as e:
@@ -90,8 +90,22 @@ def downloadClip():
 
 
 def main():
-    #createDirectories()
-    downloadClip()
+    createDirectories()
+    selection = int(input(" 1. Add clips to list \n 2. Download clips \n 3. Add and download clips\n"))
+    if selection == 1:
+        clipsToDownload = int(input("How many clips do you want to download?\n"))
+        getClipToDownload(clipsToDownload)
+    elif selection == 2:
+        #This shouldn't work like this, fix later
+        clipsToDownload = int(input("How many clips do you want to download?\n"))
+        downloadClip(clipsToDownload)
+    elif selection == 3:
+        clipsToDownload = int(input("How many clips do you want to download?\n"))
+        getClipToDownload(clipsToDownload)
+        downloadClip(clipsToDownload)
+    else:
+        print("ok bye lmao")
+
 
 if __name__ == "__main__":
     main()
