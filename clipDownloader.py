@@ -1,11 +1,13 @@
 #Downloads clips from twitch using youtube-dl 
 from os.path import isdir
 import selenium
+from selenium.webdriver.remote.errorhandler import ErrorCode
 from streamers import streamerList
 from clips import clipList
 import os
 from time import sleep
 from selenium import webdriver
+import re
 from multiprocessing.dummy import Pool as ThreadPool
 
 #Create clips directory
@@ -45,7 +47,7 @@ def getClipToDownload(numClips):
     sleep(8)
     for url in urlList:
         #Go to the url, get the urls for the first 5 clips.
-        driver.get(url)
+        driver.get()
         driver.maximize_window()
         sleep(4)
         xPathTemp = "//*[@id=\"root\"]/div/div[2]/div/main/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/div/div[3]/div/div/div/div/div[2]/div/div/div[1]/div/div/div/div["
@@ -67,6 +69,7 @@ def downloadClip(clipsToDownload):
     count=0
     streamer = 0
     for clipUrl in clipList:
+        
         try:
             downloadCommand = "cd Clips & cd "+streamerList[streamer]+" & youtube-dl.exe -f best "+clipUrl
             os.system(downloadCommand)
@@ -79,23 +82,40 @@ def downloadClip(clipsToDownload):
             print("Finished downloading every clip.")
             break
 
+def multithreadedDownloadClip(clipUrl):
+    if (clipUrl):
+        streamer = re.search(r'https://www.twitch.tv/(.*?)/clip/',clipUrl).group(1)
+        try:
+            splitUrl = clipUrl.split("?",1)
+            url = splitUrl[0]
+            downloadCommand = "cd Clips & cd "+streamer+" & youtube-dl.exe -f best "+url
+            os.system(downloadCommand)
+            print("\n")
+        except Exception as e:
+            print("Something happened")
+
+
 
 def main():
     createDirectories()
-    selection = int(input(" 1. Add clips to list \n 2. Download clips \n 3. Add and download clips\n"))
+    selection = int(input(" 1. Add clips to list \n 2. Download clips \n 3. Add and download clips\n 9. Test multithreaded download\n> "))
     if selection == 1:
-        clipsToDownload = int(input("How many clips do you want to download?\n"))
+        clipsToDownload = int(input("How many clips do you want to download? (per streamer)\n"))
         getClipToDownload(clipsToDownload)
     elif selection == 2:
         #This shouldn't work like this, fix later
-        clipsToDownload = int(input("How many clips do you want to download?\n"))
-        #pool = ThreadPool(clipsToDownload)
-        #results = pool.map(downloadClip, )
+        clipsToDownload = int(input("How many clips do you want to download? (per streamer)\n"))
         downloadClip(clipsToDownload)
     elif selection == 3:
-        clipsToDownload = int(input("How many clips do you want to download?\n"))
+        clipsToDownload = int(input("How many clips do you want to download? (per streamer)\n"))
         getClipToDownload(clipsToDownload)
         downloadClip(clipsToDownload)
+    elif selection == 9:
+        pool = ThreadPool(len(clipList))
+        results = pool.map(multithreadedDownloadClip, clipList)
+        pool.close()
+        pool.join()
+        print("Downloads finished. Exiting program")
     else:
         print("ok bye lmao")
 
