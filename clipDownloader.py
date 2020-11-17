@@ -1,19 +1,19 @@
 #Downloads clips from twitch using youtube-dl 
 from os.path import isdir
-
-from pyautogui import sleep
 import selenium
-from streamers import streamer_list
+from streamers import streamerList
+from clips import clipList
 import os
-import time
+from time import sleep
 from selenium import webdriver
+from multiprocessing.dummy import Pool as ThreadPool
 
 #Create clips directory
 def createDirectories():
     workingDirectory = os.getcwd()
     clipDirectory = workingDirectory+"\Clips"
     if (os.path.isdir(clipDirectory)): #If clip directory exists
-        for streamer in streamer_list:
+        for streamer in streamerList:
             if (os.path.isdir(clipDirectory+"\\"+streamer)): #If streamers folder exists
                 pass
             else:
@@ -27,7 +27,7 @@ def createClipsUrls():
     url = ""
     urlList = []
     range = "7d"
-    for streamer in streamer_list:
+    for streamer in streamerList:
         url = "https://www.twitch.tv/"
         url += streamer
         url += "/videos?filter=clips&range="
@@ -61,23 +61,14 @@ def getClipToDownload(numClips):
     for c in clipList:
         clipFile.write(c+"\n")
     clipFile.close()
-    return clipList
-
-def parseClipFile():
-    f = open("ClipsUrls.txt","r")
-    content = f.read()
-    clipList = content.split("\n")
-    f.close()
-    return clipList
 
 #Download clip from twitch
 def downloadClip(clipsToDownload):
-    clipList = parseClipFile()
     count=0
     streamer = 0
     for clipUrl in clipList:
         try:
-            downloadCommand = "cd Clips & cd "+streamer_list[streamer]+" & youtube-dl.exe -f best "+clipUrl
+            downloadCommand = "cd Clips & cd "+streamerList[streamer]+" & youtube-dl.exe -f best "+clipUrl
             os.system(downloadCommand)
             print("\n")
             count +=1
@@ -98,6 +89,8 @@ def main():
     elif selection == 2:
         #This shouldn't work like this, fix later
         clipsToDownload = int(input("How many clips do you want to download?\n"))
+        #pool = ThreadPool(clipsToDownload)
+        #results = pool.map(downloadClip, )
         downloadClip(clipsToDownload)
     elif selection == 3:
         clipsToDownload = int(input("How many clips do you want to download?\n"))
